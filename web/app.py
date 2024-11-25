@@ -62,3 +62,26 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
 
 
+from collections import deque
+import json
+
+# Храним историю цен
+price_history = deque(maxlen=100)
+
+@app.route('/api/price_history')
+def get_price_history():
+    current_price = bot.get_current_price()
+    timestamp = datetime.now().strftime('%H:%M:%S')
+    
+    if current_price:
+        price_history.append({
+            'time': timestamp,
+            'price': current_price
+        })
+    
+    return jsonify({
+        'labels': [p['time'] for p in price_history],
+        'prices': [p['price'] for p in price_history],
+        'current_price': current_price,
+        'last_update': timestamp
+    })

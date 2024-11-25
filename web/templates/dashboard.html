@@ -100,3 +100,53 @@
     </div>
 </div>
 {% endblock %}
+<!-- Price Chart -->
+<div class="mt-8 bg-white rounded-lg shadow p-6">
+    <h2 class="text-xl font-bold mb-4">Price Chart</h2>
+    <canvas id="priceChart" height="400"></canvas>
+</div>
+
+{% block scripts %}
+<script>
+const ctx = document.getElementById('priceChart').getContext('2d');
+let priceChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [],
+        datasets: [{
+            label: 'BTC Price',
+            data: [],
+            borderColor: 'rgb(37, 99, 235)',
+            tension: 0.1
+        }]
+    },
+    options: {
+        responsive: true,
+        scales: {
+            y: {
+                beginAtZero: false
+            }
+        }
+    }
+});
+
+// Функция обновления данных
+function updateData() {
+    fetch('/api/price_history')
+        .then(response => response.json())
+        .then(data => {
+            priceChart.data.labels = data.labels;
+            priceChart.data.datasets[0].data = data.prices;
+            priceChart.update();
+            
+            // Обновляем текущую цену и статус
+            document.getElementById('current-price').textContent = '$' + data.current_price;
+            document.getElementById('last-update').textContent = data.last_update;
+        });
+}
+
+// Обновляем каждые 30 секунд
+setInterval(updateData, 30000);
+updateData();  // Первичное обновление
+</script>
+{% endblock %}
