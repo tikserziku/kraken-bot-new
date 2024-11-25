@@ -64,48 +64,12 @@
     </div>
 </div>
 
-<!-- Recent Trades -->
-<div class="mt-8 bg-white rounded-lg shadow p-6">
-    <h2 class="text-xl font-bold mb-4">Recent Trades</h2>
-    <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead>
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                {% for trade in trades %}
-                <tr>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ trade.timestamp }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                            {% if trade.type == "buy" %}
-                            bg-green-100 text-green-800
-                            {% else %}
-                            bg-red-100 text-red-800
-                            {% endif %}">
-                            {{ trade.type }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">${{ trade.price }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap">{{ trade.amount }} BTC</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-
-<!-- Price Chart -->
+<!-- Chart -->
 <div class="mt-8 bg-white rounded-lg shadow p-6">
     <h2 class="text-xl font-bold mb-4">Price Chart</h2>
     <canvas id="priceChart" height="400"></canvas>
 </div>
-{% endblock %}
+{% endblock content %}
 
 {% block scripts %}
 <script>
@@ -146,135 +110,8 @@ function updateData() {
         });
 }
 
-// Update every 30 seconds
 setInterval(updateData, 30000);
 updateData();
 </script>
-{% endblock %}   
-
-    function updateChart() {
-        fetch('/api/price_history')
-            .then(response => response.json())
-            .then(data => {
-                priceChart.data.labels = data.labels;
-                priceChart.data.datasets[0].data = data.prices;
-                priceChart.update();
-            });
-    }
-
-    // Update every 30 seconds
-    setInterval(updateChart, 30000);
-    updateChart();
-});
-</script>
-{% endblock %}
-<!-- Price Chart -->
-<div class="mt-8 bg-white rounded-lg shadow p-6">
-    <h2 class="text-xl font-bold mb-4">Price Chart</h2>
-    <canvas id="priceChart" height="400"></canvas>
-</div>
-
-{% block scripts %}
-<script>
-const ctx = document.getElementById('priceChart').getContext('2d');
-let priceChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-        labels: [],
-        datasets: [{
-            label: 'BTC Price',
-            data: [],
-            borderColor: 'rgb(37, 99, 235)',
-            tension: 0.1
-        }]
-    },
-    options: {
-        responsive: true,
-        scales: {
-            y: {
-                beginAtZero: false
-            }
-        }
-    }
-});
-
-// Функция обновления данных
-function updateData() {
-    fetch('/api/price_history')
-        .then(response => response.json())
-        .then(data => {
-            priceChart.data.labels = data.labels;
-            priceChart.data.datasets[0].data = data.prices;
-            priceChart.update();
-            
-            // Обновляем текущую цену и статус
-            document.getElementById('current-price').textContent = '$' + data.current_price;
-            document.getElementById('last-update').textContent = data.last_update;
-        });
-}
-
-// Обновляем каждые 30 секунд
-setInterval(updateData, 30000);
-updateData();  // Первичное обновление
-</script>
-<!-- Price Chart -->
-<div class="mt-8 bg-white rounded-lg shadow p-6">
-    <h2 class="text-xl font-bold mb-4">Price Chart</h2>
-    <canvas id="priceChart" class="w-full" height="400"></canvas>
-</div>
-
-<!-- Chart Scripts -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('priceChart').getContext('2d');
-    let priceChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'BTC Price',
-                data: [],
-                borderColor: 'rgb(37, 99, 235)',
-                tension: 0.1,
-                fill: false
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    ticks: {
-                        callback: function(value) {
-                            return '
- + value.toLocaleString();
-                        }
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
-        }
-    });
-
-    function updateChart() {
-        fetch('/api/price_history')
-            .then(response => response.json())
-            .then(data => {
-                priceChart.data.labels = data.labels;
-                priceChart.data.datasets[0].data = data.prices;
-                priceChart.update();
-            });
-    }
-
-    // Update every 30 seconds
-    setInterval(updateChart, 30000);
-    updateChart();
-});
-</script>
-{% endblock %}
+{% endblock scripts %}
 
