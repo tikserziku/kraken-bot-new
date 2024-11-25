@@ -58,6 +58,31 @@ def toggle_bot():
         bot.start()
     return redirect(url_for('index'))
 
+# Price history storage
+price_history = {
+    'times': [],
+    'prices': []
+}
+
+@app.route('/api/price_history')
+def get_price_history():
+    current_time = datetime.now().strftime('%H:%M:%S')
+    current_price = bot.get_current_price()
+    
+    if current_price:
+        price_history['times'].append(current_time)
+        price_history['prices'].append(current_price)
+        
+        # Keep only last 20 points
+        if len(price_history['times']) > 20:
+            price_history['times'] = price_history['times'][-20:]
+            price_history['prices'] = price_history['prices'][-20:]
+    
+    return jsonify({
+        'labels': price_history['times'],
+        'prices': price_history['prices']
+    })
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
 
@@ -85,3 +110,4 @@ def get_price_history():
         'current_price': current_price,
         'last_update': timestamp
     })
+
