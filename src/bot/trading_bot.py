@@ -6,3 +6,4 @@
         self.trades = []
         self.balance = 10000
         self.btc_amount = 0
+        self.is_running = False
