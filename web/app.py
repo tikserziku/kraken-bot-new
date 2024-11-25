@@ -16,33 +16,18 @@ bot = BitcoinTradingBot(
 @app.route('/')
 def index():
     # Get current bot status
+    current_price = bot.get_current_price() or 40000
     portfolio = {
-        'balance': 10000,
-        'btc_amount': 0.5,
-        'current_price': 40000,
+        'balance': bot.balance,
+        'btc_amount': bot.btc_amount,
+        'current_price': current_price,
         'last_update': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
 
-    # Sample trades data
-    trades = [
-        {
-            'timestamp': '2024-11-25 10:00:00',
-            'type': 'buy',
-            'price': 39000,
-            'amount': 0.1
-        },
-        {
-            'timestamp': '2024-11-25 09:00:00',
-            'type': 'sell',
-            'price': 41000,
-            'amount': 0.05
-        }
-    ]
-
     # Trading settings
     settings = {
-        'buy_threshold': -2.0,
-        'sell_threshold': 2.0
+        'buy_threshold': bot.buy_threshold,
+        'sell_threshold': bot.sell_threshold
     }
 
     return render_template('dashboard.html',
@@ -50,20 +35,19 @@ def index():
                          btc_amount=portfolio['btc_amount'],
                          current_price=portfolio['current_price'],
                          last_update=portfolio['last_update'],
-                         trades=trades,
+                         trades=bot.trades,
                          settings=settings,
                          is_running=bot.is_running)
 
 @app.route('/settings', methods=['POST'])
 def update_settings():
     if not bot.is_running:
-        new_buy = float(request.form.get('buy_threshold', -2.0))
-        new_sell = float(request.form.get('sell_threshold', 2.0))
+        new_buy = float(request.form.get('buy_threshold', -0.5))
+        new_sell = float(request.form.get('sell_threshold', 0.5))
         app.logger.info(f"Old settings: buy={bot.buy_threshold}, sell={bot.sell_threshold}")
         app.logger.info(f"New settings: buy={new_buy}, sell={new_sell}")
         bot.buy_threshold = new_buy
         bot.sell_threshold = new_sell
-        app.logger.info(f"Settings updated: buy={bot.buy_threshold}, sell={bot.sell_threshold}")
     return redirect(url_for('index'))
 
 @app.route('/toggle', methods=['POST'])
