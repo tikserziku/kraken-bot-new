@@ -20,7 +20,7 @@
                 <span class="text-gray-600">BTC Amount:</span>
                 <span class="font-bold">{{ btc_amount }} BTC</span>
             </p>
-            <form method="POST" action="{{ url_for('toggle_bot') }}" class="mt-4">
+            <form method="POST" action="{{ url_for("toggle_bot") }}" class="mt-4">
                 <button type="submit" class="w-full py-2 px-4 rounded {% if is_running %}bg-red-600 hover:bg-red-700{% else %}bg-green-600 hover:bg-green-700{% endif %} text-white">
                     {{ "Stop Bot" if is_running else "Start Bot" }}
                 </button>
@@ -40,10 +40,10 @@
     <!-- Settings -->
     <div class="bg-white rounded-lg shadow p-6">
         <h2 class="text-xl font-bold mb-4">Trading Settings</h2>
-        <form method="POST" action="{{ url_for('update_settings') }}" class="space-y-4">
+        <form method="POST" action="{{ url_for("update_settings") }}" class="space-y-4">
             <div>
                 <label class="block text-gray-700 mb-2">Buy Threshold (%)</label>
-                <input type="number" name="buy_threshold" step="0.1" 
+                <input type="number" name="buy_threshold" step="0.1"
                        value="{{ settings.buy_threshold }}"
                        class="w-full p-2 border rounded"
                        {% if is_running %}disabled{% endif %}>
@@ -55,7 +55,7 @@
                        class="w-full p-2 border rounded"
                        {% if is_running %}disabled{% endif %}>
             </div>
-            <button type="submit" 
+            <button type="submit"
                     class="w-full bg-blue-600 text-white rounded py-2 px-4 hover:bg-blue-700"
                     {% if is_running %}disabled{% endif %}>
                 Save Settings
@@ -71,10 +71,10 @@
         <table class="min-w-full divide-y divide-gray-200">
             <thead>
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
                 </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
@@ -83,7 +83,7 @@
                     <td class="px-6 py-4 whitespace-nowrap">{{ trade.timestamp }}</td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                            {% if trade.type == 'buy' %}
+                            {% if trade.type == "buy" %}
                             bg-green-100 text-green-800
                             {% else %}
                             bg-red-100 text-red-800
@@ -99,42 +99,13 @@
         </table>
     </div>
 </div>
-<!-- Price Chart -->
-<div class="mt-8 bg-white rounded-lg shadow p-6">
-    <h2 class="text-xl font-bold mb-4">Price Chart</h2>
-    <canvas id="priceChart" class="w-full" height="400"></canvas>
-</div>
 
-<!-- Chart Scripts -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('priceChart').getContext('2d');
-    let priceChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'BTC Price',
-                data: [],
-                borderColor: 'rgb(37, 99, 235)',
-                tension: 0.1,
-                fill: false
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: false,
-                    ticks: {
-                        callback: function(value) {
-                            return '
 <!-- Price Chart -->
 <div class="mt-8 bg-white rounded-lg shadow p-6">
     <h2 class="text-xl font-bold mb-4">Price Chart</h2>
     <canvas id="priceChart" height="400"></canvas>
 </div>
+{% endblock %}
 
 {% block scripts %}
 <script>
@@ -154,13 +125,17 @@ let priceChart = new Chart(ctx, {
         responsive: true,
         scales: {
             y: {
-                beginAtZero: false
+                beginAtZero: false,
+                ticks: {
+                    callback: function(value) {
+                        return '$' + value.toLocaleString();
+                    }
+                }
             }
         }
     }
 });
 
-// Функция обновления данных
 function updateData() {
     fetch('/api/price_history')
         .then(response => response.json())
@@ -168,30 +143,14 @@ function updateData() {
             priceChart.data.labels = data.labels;
             priceChart.data.datasets[0].data = data.prices;
             priceChart.update();
-            
-            // Обновляем текущую цену и статус
-            document.getElementById('current-price').textContent = '$' + data.current_price;
-            document.getElementById('last-update').textContent = data.last_update;
         });
 }
 
-// Обновляем каждые 30 секунд
+// Update every 30 seconds
 setInterval(updateData, 30000);
-updateData();  // Первичное обновление
+updateData();
 </script>
-{% endblock %}
- + value.toLocaleString();
-                        }
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                }
-            }
-        }
-    });
+{% endblock %}   
 
     function updateChart() {
         fetch('/api/price_history')
