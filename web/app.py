@@ -57,8 +57,13 @@ def index():
 @app.route('/settings', methods=['POST'])
 def update_settings():
     if not bot.is_running:
-        bot.buy_threshold = float(request.form.get('buy_threshold', -2.0))
-        bot.sell_threshold = float(request.form.get('sell_threshold', 2.0))
+        new_buy = float(request.form.get('buy_threshold', -2.0))
+        new_sell = float(request.form.get('sell_threshold', 2.0))
+        app.logger.info(f"Old settings: buy={bot.buy_threshold}, sell={bot.sell_threshold}")
+        app.logger.info(f"New settings: buy={new_buy}, sell={new_sell}")
+        bot.buy_threshold = new_buy
+        bot.sell_threshold = new_sell
+        app.logger.info(f"Settings updated: buy={bot.buy_threshold}, sell={bot.sell_threshold}")
     return redirect(url_for('index'))
 
 @app.route('/toggle', methods=['POST'])
