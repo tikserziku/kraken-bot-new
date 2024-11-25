@@ -10,6 +10,8 @@ class BitcoinTradingBot:
         self.balance = 10000
         self.btc_amount = 0
         self.is_running = False
+        self.buy_threshold = -2.0
+        self.sell_threshold = 2.0
         self.trading_thread = None
 
     def start(self):
@@ -21,6 +23,8 @@ class BitcoinTradingBot:
 
     def stop(self):
         self.is_running = False
+        self.buy_threshold = -2.0
+        self.sell_threshold = 2.0
         if self.trading_thread:
             self.trading_thread.join(timeout=5)
             self.trading_thread = None
@@ -33,3 +37,4 @@ class BitcoinTradingBot:
             except Exception as e:
                 print(f"Error in trading loop: {e}")
                 time.sleep(5)
+
