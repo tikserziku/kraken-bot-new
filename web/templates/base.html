@@ -1,21 +1,12 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kraken Trading Bot</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
 </head>
-<body class="bg-gray-100">
-    <nav class="bg-blue-600 p-4">
-        <div class="container mx-auto">
-            <h1 class="text-2xl font-bold text-white">Kraken Trading Bot</h1>
-        </div>
-    </nav>
-    <main class="container mx-auto px-4 py-8">
-        {% block content %}{% endblock content %}
-    </main>
-    {% block scripts %}{% endblock scripts %}
+<body>
+    <div id="content">{% block content %}{% endblock %}</div>
+    {% block scripts %}{% endblock %}
 </body>
 </html>
